@@ -12,6 +12,8 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.Executors;
 
 public class WorldTimeSync extends JavaPlugin {
 
@@ -32,11 +34,7 @@ public class WorldTimeSync extends JavaPlugin {
         FilenameFilter filter = new FilenameFilter() {
             public boolean accept(File pathname, String name) {
                 String lowercase = name.toLowerCase();
-                if (lowercase.endsWith(".dat")) {
-                    return true;
-                } else {
-                    return false;
-                }
+                return lowercase.endsWith(".dat");
             }
         };
         File path = Bukkit.getServer().getWorldContainer();
@@ -48,7 +46,7 @@ public class WorldTimeSync extends JavaPlugin {
                 if (file.isDirectory() && file.list(filter) != null) {
                     //for (String string : file.list(filter)) {
                     List list = Arrays.asList(file.list(filter));
-                    if(list.contains("level.dat")) {
+                    if (list.contains("level.dat")) {
                         System.out.println(file.getName());
                         worldNames.add(file.getName());
                         // }
@@ -72,14 +70,14 @@ public class WorldTimeSync extends JavaPlugin {
             isNight = true;
         }
         if (isNight) {
+            loadWorlds();
             new BukkitRunnable() {
+                @Override
                 public void run() {
                     for (String string : getWorldNames()) {
                         World w = Bukkit.getWorld(string);
-                        if(w.getEnvironment() == World.Environment.NORMAL) {
+                        if (w.getEnvironment() == World.Environment.NORMAL) {
                             //todo Allow for usage of non minecraft world generators
-                            WorldCreator worldCreator = new WorldCreator(string);
-                            worldCreator.createWorld();
                             if (w.isThundering()) {
                                 w.setThundering(false);
                             }
@@ -87,6 +85,7 @@ public class WorldTimeSync extends JavaPlugin {
                                 w.setStorm(false);
                             }
                             w.setTime(time);
+                            System.out.println(w.getName() + " has had its time set to " + time);
                         }
                         for (Player p : w.getPlayers()) {
                             if (w == p.getWorld()) {
@@ -94,11 +93,18 @@ public class WorldTimeSync extends JavaPlugin {
                             } else {
                                 p.sendMessage(sleeper.getDisplayName() + " has slept in another world and moved time forward");
                             }
-                            System.out.println(w.getName() + " has had its time set to " + time);
                         }
                     }
                 }
-            }.runTaskLater(WorldTimeSync.getInstance(), 20 * 5);
+            }.runTaskLater(WorldTimeSync.getInstance(), 8*20);
+
+        }
+    }
+
+    private void loadWorlds() {
+        for (String worldName : getWorldNames()) {
+            WorldCreator worldCreator = new WorldCreator(worldName);
+            worldCreator.createWorld();
         }
     }
 }

@@ -3,6 +3,7 @@ package me.morphicdream.worldtimesync;
 import me.morphicdream.worldtimesync.commands.SleepCommand;
 import org.bukkit.Bukkit;
 import org.bukkit.World;
+import org.bukkit.WorldCreator;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.scheduler.BukkitRunnable;
@@ -77,13 +78,18 @@ public class WorldTimeSync extends JavaPlugin {
                 public void run() {
                     for (String string : getWorldNames()) {
                         World w = Bukkit.getWorld(string);
-                        if(w.isThundering()) {
-                            w.setThundering(false);
+                        if(w.getEnvironment() == World.Environment.NORMAL) {
+                            //todo Allow for usage of non minecraft world generators
+                            WorldCreator worldCreator = new WorldCreator(string);
+                            worldCreator.createWorld();
+                            if (w.isThundering()) {
+                                w.setThundering(false);
+                            }
+                            if (w.hasStorm()) {
+                                w.setStorm(false);
+                            }
+                            w.setTime(time);
                         }
-                        if(w.hasStorm()) {
-                            w.setStorm(false);
-                        }
-                        w.setTime(time);
                         for (Player p : w.getPlayers()) {
                             if (w == p.getWorld()) {
                                 p.sendMessage(sleeper.getDisplayName() + " has slept and moved time forward!");

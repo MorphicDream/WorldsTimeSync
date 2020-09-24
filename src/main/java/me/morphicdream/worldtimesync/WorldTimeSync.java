@@ -20,6 +20,7 @@ public class WorldTimeSync extends JavaPlugin {
     private static WorldTimeSync instance;
     private final int time = 1000;//This should be 7am mc time
     private boolean isNight;
+    private static boolean hasSlept = false;
 
     public WorldTimeSync() {
         instance = this;
@@ -58,39 +59,45 @@ public class WorldTimeSync extends JavaPlugin {
         return instance;
     }
 
-    public void syncWorlds(World world, final Player sleeper) {
-        System.out.println(sleeper.getName() + " called syncWorlds");
-        if (world.getTime() > 13000 && world.getTime() < 23460) {
-            isNight = true;
-        }
-        if (isNight) {
-            loadWorlds();
-            new BukkitRunnable() {
-                @Override
-                public void run() {
-                    for (String string : getWorldNames()) {
-                        World w = Bukkit.getWorld(string);
-                        if (w.getEnvironment() == World.Environment.NORMAL) {
-                            if (w.isThundering()) {
-                                w.setThundering(false);
-                            }
-                            if (w.hasStorm()) {
-                                w.setStorm(false);
-                            }
-                            w.setTime(time);
-                            System.out.println(w.getName() + " has had its time set to " + time);
-                        }
-                        for (Player p : w.getPlayers()) {
-                            if (w == p.getWorld()) {
-                                p.sendMessage(sleeper.getDisplayName() + " has slept and moved time forward!");
-                            } else {
-                                p.sendMessage(sleeper.getDisplayName() + " has slept in another world and moved time forward");
-                            }
-                        }
-                    }
-                }
-            }.runTaskLater(WorldTimeSync.getInstance(), 8 * 20);
+    private static boolean isSlept() {
+        return hasSlept;
+    }
 
+    public void syncWorlds(World world, final Player sleeper) {
+        if (!isSlept()) {
+            System.out.println(sleeper.getName() + " called syncWorlds");
+            if (world.getTime() > 13000 && world.getTime() < 23460) {
+                isNight = true;
+            }
+            if (isNight) {
+                loadWorlds();
+                new BukkitRunnable() {
+                    @Override
+                    public void run() {
+                        for (String string : getWorldNames()) {
+                            World w = Bukkit.getWorld(string);
+                            if (w.getEnvironment() == World.Environment.NORMAL) {
+                                if (w.isThundering()) {
+                                    w.setThundering(false);
+                                }
+                                if (w.hasStorm()) {
+                                    w.setStorm(false);
+                                }
+                                w.setTime(time);
+                                System.out.println(w.getName() + " has had its time set to " + time);
+                            }
+                            for (Player p : w.getPlayers()) {
+                                if (w == p.getWorld()) {
+                                    p.sendMessage(sleeper.getDisplayName() + " has slept and moved time forward!");
+                                } else {
+                                    p.sendMessage(sleeper.getDisplayName() + " has slept in another world and moved time forward");
+                                }
+                            }
+                        }
+                        hasSlept = !hasSlept;
+                    }
+                }.runTaskLater(WorldTimeSync.getInstance(), 8 * 20);
+            }
         }
     }
 

@@ -17,7 +17,6 @@ import java.util.Objects;
 public class WorldTimeSync extends JavaPlugin {
 
     private static final List<String> worldNames = new ArrayList<>();
-    private List excluded = Arrays.asList("plugins", "logs", "crash-reports");
     private static WorldTimeSync instance;
     private final int time = 1000;//This should be 7am mc time
     private boolean isNight;

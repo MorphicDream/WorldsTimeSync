@@ -31,11 +31,9 @@ public class WorldTimeSync extends JavaPlugin {
     public void onEnable() {
         Bukkit.getPluginManager().registerEvents(new WorldListener(), getInstance());
         //getInstance().getCommand("sleep").setExecutor(new SleepCommand());
-        FilenameFilter filter = new FilenameFilter() {
-            public boolean accept(File pathname, String name) {
-                String lowercase = name.toLowerCase();
-                return lowercase.endsWith(".dat");
-            }
+        FilenameFilter filter = (pathname, name) -> {
+            String lowercase = name.toLowerCase();
+            return lowercase.endsWith(".dat");
         };
         File path = Bukkit.getServer().getWorldContainer();
         File[] files = path.listFiles();
@@ -44,12 +42,10 @@ public class WorldTimeSync extends JavaPlugin {
         } else {
             for (File file : files) {
                 if (file.isDirectory() && file.list(filter) != null) {
-                    //for (String string : file.list(filter)) {
                     List list = Arrays.asList(file.list(filter));
                     if (list.contains("level.dat")) {
                         System.out.println(file.getName());
                         worldNames.add(file.getName());
-                        // }
                     }
                 }
             }
@@ -95,7 +91,7 @@ public class WorldTimeSync extends JavaPlugin {
                         }
                     }
                 }
-            }.runTaskLater(WorldTimeSync.getInstance(), 8*20);
+            }.runTaskLater(WorldTimeSync.getInstance(), 8 * 20);
 
         }
     }

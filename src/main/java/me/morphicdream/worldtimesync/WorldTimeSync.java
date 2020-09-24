@@ -12,15 +12,14 @@ import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
+import java.util.Objects;
 
 public class WorldTimeSync extends JavaPlugin {
 
-    private static List<String> worldNames = new ArrayList<String>();
+    private static final List<String> worldNames = new ArrayList<>();
     private List excluded = Arrays.asList("plugins", "logs", "crash-reports");
     private static WorldTimeSync instance;
-    private int time = 1000;//This should be 7am mc time
+    private final int time = 1000;//This should be 7am mc time
     private boolean isNight;
 
     public WorldTimeSync() {
@@ -42,7 +41,7 @@ public class WorldTimeSync extends JavaPlugin {
         } else {
             for (File file : files) {
                 if (file.isDirectory() && file.list(filter) != null) {
-                    List list = Arrays.asList(file.list(filter));
+                    List list = Arrays.asList(Objects.requireNonNull(file.list(filter)));
                     if (list.contains("level.dat")) {
                         System.out.println(file.getName());
                         worldNames.add(file.getName());
@@ -52,7 +51,7 @@ public class WorldTimeSync extends JavaPlugin {
         }
     }
 
-    public List<String> getWorldNames() {
+    private List<String> getWorldNames() {
         return worldNames;
     }
 

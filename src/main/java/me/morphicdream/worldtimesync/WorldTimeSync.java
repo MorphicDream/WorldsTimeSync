@@ -77,7 +77,6 @@ public class WorldTimeSync extends JavaPlugin {
                     for (String string : getWorldNames()) {
                         World w = Bukkit.getWorld(string);
                         if (w.getEnvironment() == World.Environment.NORMAL) {
-                            //todo Allow for usage of non minecraft world generators
                             if (w.isThundering()) {
                                 w.setThundering(false);
                             }
@@ -102,6 +101,7 @@ public class WorldTimeSync extends JavaPlugin {
     }
 
     private void loadWorlds() {
+        //todo Allow for usage of non minecraft world generators
         for (String worldName : getWorldNames()) {
             WorldCreator worldCreator = new WorldCreator(worldName);
             worldCreator.createWorld();

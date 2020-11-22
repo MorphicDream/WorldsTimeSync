@@ -9,16 +9,16 @@ import java.util.Objects;
 
 class SyncHandler extends BukkitRunnable {
 
-    private final int time = 1000;//This should be 7am mc time
-    private final Player sleeper;
+    private static final int time = 1000;//This should be 7am mc time
+    private static Player sleeper;
 
     SyncHandler(Player sleeper) {
-        this.sleeper = sleeper;
+        SyncHandler.sleeper = sleeper;
     }
 
     @Override
     public void run() {
-        for (String string : WorldTimeSync.getInstance().getWorldNames()) {
+        for (String string : WorldTimeSync.getWorldNames()) {
             World w = Bukkit.getWorld(string);
             if (Objects.requireNonNull(w).getEnvironment() == World.Environment.NORMAL) {
                 if (w.isThundering()) {
@@ -38,6 +38,6 @@ class SyncHandler extends BukkitRunnable {
                 }
             }
         }
-        WorldTimeSync.clearSleeperUUID();
+        WorldTimeSync.getInstance().clearSleeperUUID();
     }
 }

@@ -9,8 +9,8 @@ class WorldListener implements Listener {
 
     @EventHandler
     public void onSleep(PlayerBedEnterEvent event) {
-        if(WorldTimeSync.getSleeperUUID().size() < 1) {
-            WorldTimeSync.addSleeper(event.getPlayer().getUniqueId());
+        if(WorldTimeSync.getInstance().getSleeperUUID() != null) {
+            WorldTimeSync.getInstance().addSleeper(event.getPlayer().getUniqueId());
             WorldTimeSync.getInstance().syncWorlds(event.getPlayer().getWorld(), event.getPlayer());
         }
     }
@@ -18,9 +18,9 @@ class WorldListener implements Listener {
     @EventHandler
     public void onAbortSleep(PlayerBedLeaveEvent event) {
         System.out.println(event.getPlayer().getName() + " left bed");
-        if (WorldTimeSync.getSleeperUUID().contains(event.getPlayer().getUniqueId())) {
-            WorldTimeSync.getInstance().getTask().cancel();
-            WorldTimeSync.clearSleeperUUID();
+        if (WorldTimeSync.getInstance().getSleeperUUID().equals(event.getPlayer().getUniqueId())) {
+            WorldTimeSync.getTask().cancel();
+            WorldTimeSync.getInstance().clearSleeperUUID();
             System.out.println("Task cancelled by " + event.getPlayer().getName());
         }
     }
